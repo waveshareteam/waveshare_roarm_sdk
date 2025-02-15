@@ -7,11 +7,11 @@ This is a python API for serial or http communication with waveshare roarm and c
 
 [Waveshare RoArm-M2 Series](https://www.waveshare.com/roarm-m2-s.htm): **RoArm-M2-S**， **RoArm-M2-Pro**.
 
-[![home](./images/roarm-m2-s.jpg)](https://www.waveshare.com/roarm-m2-s.htm)
+[![home](./images/roarm_m2.jpg)](https://www.waveshare.com/roarm-m2-s.htm)
 
 [Waveshare RoArm-M3 Series](https://www.waveshare.com/roarm-m3-s.htm): **RoArm-M3-S**， **RoArm-M3-Pro**.
 
-[![home](./images/roarm-m3-s.jpg)](https://www.waveshare.com/roarm-m3-s.htm)
+[![home](./images/roarm_m3.jpg)](https://www.waveshare.com/roarm-m3-s.htm)
 
 ## Installation
 
