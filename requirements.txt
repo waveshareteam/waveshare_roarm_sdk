@@ -1,0 +1,7 @@
+pyserial
+requests
+json
+#simplejson py3.10
+pytest
+flake8
+crc
