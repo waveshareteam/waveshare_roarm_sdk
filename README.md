@@ -18,12 +18,6 @@ This is a python API for serial or http communication with waveshare roarm and c
 
 ## Installation
 
-### Pip
-
-```bash
-pip install roarm-sdk
-```
-
 ### Source code
 
 ```bash
