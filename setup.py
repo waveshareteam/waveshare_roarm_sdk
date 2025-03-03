@@ -3,20 +3,28 @@ from __future__ import print_function
 import sys
 
 PYTHON_VERSION = sys.version_info[:2]
-if (2, 7) != PYTHON_VERSION < (3, 5):
-    print("This roarm_sdk version requires Python2.7, 3.5 or later.")
+if PYTHON_VERSION != (2, 7) and PYTHON_VERSION < (3, 5):
+    print("This roarm_sdk version requires Python 2.7, 3.5 or later.")
     sys.exit(1)
 
 import setuptools
 import textwrap
 import roarm_sdk
 
+install_requires = [
+    "pyserial",
+    "requests"
+]
+
+if sys.version_info >= (3, 10):
+    install_requires.append("simplejson")
+
 try:
     long_description = (
         open("README.md", encoding="utf-8").read()
         + open("docs/README.md", encoding="utf-8").read()
     )
-except:
+except (FileNotFoundError, IOError):
     long_description = textwrap.dedent(
         """
         waveshare roarm sdk
@@ -46,6 +54,6 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    install_requires=["pyserial", "requests", "crc"],
-    python_requires=">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, != 3.4.*",
+    install_requires=install_requires,
+    python_requires=">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*",
 )

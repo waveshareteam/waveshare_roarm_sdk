@@ -12,10 +12,10 @@ __all__ = [
     "utils"
 ]
 
-__version__ = "0.0.1" 
-__author__ = "dudu"
+__version__ = "0.0.11" 
+__author__ = "waveshareteam"
 __email__ = "2849678712@qq.com"
-__git_url__ = ""
+__git_url__ = "https://github.com/waveshareteam/waveshare_roarm_sdk.git"
 __copyright__ = "".format(
     datetime.datetime.now().year
 )
