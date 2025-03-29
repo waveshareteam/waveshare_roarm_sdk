@@ -382,7 +382,7 @@ def write(self, command, method=None):
                 log_command += i
             else:
                 log_command += hex(i)[2:] + " "
-        self.log.debug("_write: {}".format(log_command))
+        # self.log.debug("_write: {}".format(log_command))
 
         self.sock.sendall(command)
     else:
@@ -404,5 +404,5 @@ def read(self, genre):
     self.base_controller = BaseController(port=self._serial_port,roarm_type=self.type)
     data = self.base_controller.feedback_data()
     if data:
-        self.log.debug("_read : {}".format(data))
+        # self.log.debug("_read : {}".format(data))
         return data
