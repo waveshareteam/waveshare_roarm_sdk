@@ -62,22 +62,19 @@ class ReadLine:
 
             if start >= 0:  
                 end = self.buf.find(terminator, start)
-
                 if end > start: 
                     r = self.buf[start:end+1]
                     self.buf = self.buf[end+1:]
                     self.last_complete_line = r
                     return r 
-                
+            else:    
                 k = max(i, min(self.max_frame_length, self.s.in_waiting))
                 data = self.s.read(k)
-
                 if not data:
                     if self.last_complete_line:
                         return bytes(self.last_complete_line)
                     else:
                         continue
-
                 self.buf.extend(data) 
  
     def clear_buffer(self):
@@ -107,6 +104,7 @@ class BaseController:
         
         feedback_data_m2 = {"T": 1051, "x": 0, "y": 0, "z": 0, "b": 0, "s": 0, "e": 0, "t": 0, "torB": 0, "torS": 0, "torE": 0, "torH": 0}
         feedback_data_m3 = {"T": 1051, "x": 0, "y": 0, "z": 0, "tit": 0, "b": 0, "s": 0, "e": 0, "t": 0, "r": 0, "g": 0, "tB": 0, "tS": 0, "tE": 0, "tT": 0, "tR": 0, "tG": 0}
+
         switch_dict = {
             "roarm_m2": feedback_data_m2,
             "roarm_m3": feedback_data_m3,
@@ -394,6 +392,7 @@ def write(self, command, method=None):
             else:
                 command_log += hex(i)[2:] + " "
         self.log.debug("_write: {}".format(command_log))
+        print("_write: {}".format(command))
         self._serial_port.write(command)
         self._serial_port.flush()
 

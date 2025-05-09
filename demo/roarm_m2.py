@@ -6,7 +6,6 @@ roarm = roarm(roarm_type="roarm_m2", port="/dev/ttyUSB0", baudrate=115200)
 # Http communication example
 # Note: HTTP communication needs to be connected to the same wifi first, and host is the IP address of the robotic arm.
 #roarm = roarm(roarm_type="roarm_m2", host="192.168.4.1")
-roarm.echo_set(cmd=0)
 
 def main():
     cmd = 0
