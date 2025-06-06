@@ -20,7 +20,7 @@ This is a python API for serial or http communication with waveshare roarm and c
 ### Pip install
 
 ```bash
-pip install roarm-sdk==0.0.12
+pip install roarm-sdk==0.0.13
 ```
 
 ### Source code

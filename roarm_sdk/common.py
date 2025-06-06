@@ -399,7 +399,10 @@ def read(self, genre):
     if genre != JsonCmd.FEEDBACK_GET:
         request_data = json.dumps({'T': 105}) + "\n"      
         self._serial_port.write(request_data.encode())     
-    self.base_controller = BaseController(port=self._serial_port,roarm_type=self.type)
+        
+    if self.base_controller is None:
+        self.base_controller = BaseController(port=self._serial_port, roarm_type=self.type)  
+
     data = self.base_controller.feedback_data()
     if data:
         # self.log.debug("_read : {}".format(data))

@@ -32,6 +32,7 @@ class roarm(CommandGenerator):
         self.thread_lock = thread_lock
         self.host =None            
         self.stop_flag = False
+        self.base_controller = None
 
         if thread_lock:
             self.lock = threading.Lock()
