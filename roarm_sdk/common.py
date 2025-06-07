@@ -7,6 +7,7 @@ import queue
 import threading
 import logging
 import math
+from datetime import datetime
 
 class JsonCmd(object):
     ECHO_SET = 605
@@ -32,64 +33,40 @@ class JsonCmd(object):
 class ReadLine:
     def __init__(self, s):
         self.buf = bytearray()  
-        self.last_complete_line = bytearray()  
         self.s = s         
-        self.timeout = 10 
+        self.timeout = 0.1 
         self.frame_start = b'{'
-        self.max_frame_length = 1024
+        self.frame_end =  b"}\r\n"
+        self.max_frame_length = 512
  
     def readline(self):
         start_time = time.time() 
         while True:
-            if time.time() - start_time > self.timeout:
-                if self.last_complete_line:
-                    return bytes(self.last_complete_line)
-
             i = max(1, min(self.max_frame_length, self.s.in_waiting))
             data = self.s.read(i)
+            if data:
+                self.buf.extend(data)
 
-            if not data:
-                if self.last_complete_line:
-                    return bytes(self.last_complete_line)
-                else:
+            end = self.buf.rfind(self.frame_end)
+
+            if end >= 0:  
+                start = self.buf.rfind(self.frame_start, 0, end)
+                if start >= 0 and start < end:
+                    r = self.buf[start:end + len(self.frame_end)] 
+                    self.buf = self.buf[end + len(self.frame_end):]
+                    return r
+                elif start == -1:
                     continue
 
-            self.buf.extend(data)
-
-            terminator =  b"}\r\n"
-            
-            start = self.buf.find(self.frame_start)
-
-            if start >= 0:  
-                end = self.buf.find(terminator, start)
-                if end > start: 
-                    r = self.buf[start:end+1]
-                    self.buf = self.buf[end+1:]
-                    self.last_complete_line = r
-                    return r 
-            else:    
-                k = max(i, min(self.max_frame_length, self.s.in_waiting))
-                data = self.s.read(k)
-                if not data:
-                    if self.last_complete_line:
-                        return bytes(self.last_complete_line)
-                    else:
-                        continue
-                self.buf.extend(data) 
+            if time.time() - start_time > self.timeout:
+                break
  
     def clear_buffer(self):
         self.buf = bytearray()
-        self.last_complete_line = bytearray()
         try:
             self.s.reset_input_buffer()
         except Exception as e:
             print(f"Error resetting input buffer: {e}")
- 
-    def has_last_complete_line(self):
-        return len(self.last_complete_line) > 0
- 
-    def get_last_complete_line(self):
-        return bytes(self.last_complete_line)
         
 class BaseController:
     def __init__(self, roarm_type, port):
@@ -97,9 +74,6 @@ class BaseController:
         self.ser = port
         self.type = roarm_type
         self.rl = ReadLine(self.ser)
-        self.command_queue = queue.Queue()
-        self.command_thread = threading.Thread(target=self.process_commands, daemon=True)
-        self.command_thread.start()
         self.data_buffer = None
         
         feedback_data_m2 = {"T": 1051, "x": 0, "y": 0, "z": 0, "b": 0, "s": 0, "e": 0, "t": 0, "torB": 0, "torS": 0, "torE": 0, "torH": 0}
@@ -114,27 +88,16 @@ class BaseController:
     def feedback_data(self):
         try:
             line = self.rl.readline().decode('utf-8')
-            if line != b'':
-                self.data_buffer = json.loads(line)
-                self.base_data = self.data_buffer
-                return self.base_data                 
-            self.rl.clear_buffer()    
+            self.data_buffer = json.loads(line)
+            self.base_data = self.data_buffer
+            self.rl.clear_buffer()   
+            return self.base_data                  
         except json.JSONDecodeError as e:
             self.log.error(f"JSON decode error: {e} with line: {line}")
             self.rl.clear_buffer()
         except Exception as e:
             self.log.error(f"[base_ctrl.feedback_data] unexpected error: {e}")
             self.rl.clear_buffer()
-
-    def on_data_received(self):
-        self.ser.reset_input_buffer()
-        data_read = json.loads(self.rl.readline().decode('utf-8'))
-        return data_read
-
-    def process_commands(self):
-        while True:
-            data = self.command_queue.get()
-            self.ser.write((json.dumps(data) + '\n').encode("utf-8"))
     
 def handle_echo_or_torque_set(roarm_type,command,command_data):
     command.update({"cmd": command_data[0]})
@@ -398,8 +361,8 @@ def write(self, command, method=None):
 def read(self, genre):
     if genre != JsonCmd.FEEDBACK_GET:
         request_data = json.dumps({'T': 105}) + "\n"      
-        self._serial_port.write(request_data.encode())     
-        
+        self._serial_port.write(request_data.encode())    
+
     if self.base_controller is None:
         self.base_controller = BaseController(port=self._serial_port, roarm_type=self.type)  
 
